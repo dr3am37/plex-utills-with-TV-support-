@@ -1,4 +1,5 @@
 # plex-utills
+## This is a simple fork to add TV library support to the script, it will now search and add banners to your TV shows as well.
 ## You will likely need to re-create or update your config file after updating as there are breaking changes. 
 ### Changes
 Setting whether scripts should run or selecting options has now moved to a different config block. 
