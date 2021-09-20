@@ -60,7 +60,7 @@ python3-pip
 
 ### Instructions
 Clone to your machine
-`sudo git clone https://github.com/tkatot1/plex-utills-with-TV-support-.git`
+`sudo git clone https://github.com/dr3am37/plex-utills-with-TV-support-.git`
 
 Cd into the folder
 `cd plex-utills`
