@@ -109,66 +109,62 @@ def add_hdr():
         background.save('poster.png')
         i.uploadPoster(filepath="poster.png")
 def get_TVposter():
-    is4K = False
     for ep in i.episodes():
         for med in ep.media:
-            #print(med)
-            if med.videoResolution == '4k':
-    #print(i.episodes()[0].media[0].parts[0].file)
-                newdir = os.path.dirname(re.sub(ppath, mpath, ep.media[0].parts[0].file))+'/'
-                backup = os.path.exists(newdir+'poster_bak.png')
-                imgurl = i.posterUrl
-                img = requests.get(imgurl, stream=True)
-                filename = "poster.png"
+            newdir = os.path.dirname(re.sub(ppath, mpath, ep.media[0].parts[0].file))+'/'
+            backup = os.path.exists(newdir+'poster_bak.png')
+            imgurl = i.posterUrl
+            img = requests.get(imgurl, stream=True)
+            filename = "poster.png"
 
-                if img.status_code == 200:
-                    img.raw.decode_content = True
-                    with open(filename, 'wb') as f:
-                        shutil.copyfileobj(img.raw, f)
-                    if pbak == 'true': 
-                        if backup == True: 
-                            #open backup poster to compare it to the current poster. If it is similar enough it will skip, if it's changed then create a new backup and add the banner. 
-                            poster = os.path.join(newdir, 'poster_bak.png')
-                            b_check1 = Image.open(filename)
-                            b_check = Image.open(poster)
-                            b_hash = imagehash.average_hash(b_check)
-                            b_hash1 = imagehash.average_hash(b_check1)
-                            cutoff = 10
-                            if b_hash - b_hash1 < cutoff:    
-                                print(Fore.GREEN, 'Backup File Exists, Skipping...', Fore.RESET)
+            if img.status_code == 200:
+                img.raw.decode_content = True
+                with open(filename, 'wb') as f:
+                    shutil.copyfileobj(img.raw, f)
+                if pbak == 'true': 
+                    if backup == True: 
+                        #open backup poster to compare it to the current poster. If it is similar enough it will skip, if it's changed then create a new backup and add the banner. 
+                        poster = os.path.join(newdir, 'poster_bak.png')
+                        b_check1 = Image.open(filename)
+                        b_check = Image.open(poster)
+                        b_hash = imagehash.average_hash(b_check)
+                        b_hash1 = imagehash.average_hash(b_check1)
+                        cutoff = 10
+                        if b_hash - b_hash1 < cutoff:    
+                            print(Fore.GREEN, 'Backup File Exists, Skipping...', Fore.RESET)
+                        else:
+                            
+                            #Check to see if the poster has a 4k Banner
+                            background = Image.open(filename)
+                            background = background.resize(size,Image.ANTIALIAS)
+                            backgroundchk = background.crop(box)
+                            hash0 = imagehash.average_hash(backgroundchk)
+                            hash1 = imagehash.average_hash(chk_banner)
+                            cutoff= 5
+                            if hash0 - hash1 < cutoff:
+                                print(Fore.LIGHTRED_EX, 'Poster has 4k banner, skipping backup', Fore.RESET)
                             else:
-                                
-                                #Check to see if the poster has a 4k Banner
+                                #Check if the poster has a mini 4k banner
                                 background = Image.open(filename)
                                 background = background.resize(size,Image.ANTIALIAS)
-                                backgroundchk = background.crop(box)
+                                backgroundchk = background.crop(mini_box)
                                 hash0 = imagehash.average_hash(backgroundchk)
-                                hash1 = imagehash.average_hash(chk_banner)
-                                cutoff= 5
-                                if hash0 - hash1 < cutoff:
-                                    print(Fore.LIGHTRED_EX, 'Poster has 4k banner, skipping backup', Fore.RESET)
+                                hash1 = imagehash.average_hash(chk_mini_banner)
+                                cutoff= 10
+                                if hash0 - hash1 < cutoff: 
+                                    print(Fore.LIGHTRED_EX, 'Poster has mini 4K banner, skipping backup', Fore.RESET)
                                 else:
-                                    #Check if the poster has a mini 4k banner
-                                    background = Image.open(filename)
-                                    background = background.resize(size,Image.ANTIALIAS)
-                                    backgroundchk = background.crop(mini_box)
-                                    hash0 = imagehash.average_hash(backgroundchk)
-                                    hash1 = imagehash.average_hash(chk_mini_banner)
-                                    cutoff= 10
-                                    if hash0 - hash1 < cutoff: 
-                                        print(Fore.LIGHTRED_EX, 'Poster has mini 4K banner, skipping backup', Fore.RESET)
-                                    else:
-                                        print(Fore.MAGENTA, 'New poster detected, Creating a new backup', Fore.RESET)  
-                                        os.remove(poster)
-                                        print(Fore.CYAN, 'Check Passed, Creating a backup file', Fore.RESET)
-                                        dest = shutil.copyfile(filename, newdir+'poster_bak.png')
-                        else:        
-                            print(Fore.BLUE, 'Creating a backup file', Fore.RESET)
-                            dest = shutil.copyfile(filename, newdir+'poster_bak.png')
+                                    print(Fore.MAGENTA, 'New poster detected, Creating a new backup', Fore.RESET)  
+                                    os.remove(poster)
+                                    print(Fore.CYAN, 'Check Passed, Creating a backup file', Fore.RESET)
+                                    dest = shutil.copyfile(filename, newdir+'poster_bak.png')
+                    else:        
+                        print(Fore.BLUE, 'Creating a backup file', Fore.RESET)
+                        dest = shutil.copyfile(filename, newdir+'poster_bak.png')
 
-                else:
-                    print(Fore.RED+films.title+"cannot find the poster for this film")
-                    print(Fore.RESET)
+            else:
+                print(Fore.RED+films.title+"cannot find the poster for this film")
+                print(Fore.RESET)
 def get_poster():
     #print(i.episodes()[0].media[0].parts[0].file)
     newdir = os.path.dirname(re.sub(ppath, mpath, i.media[0].parts[0].file))+'/'
@@ -297,14 +293,14 @@ if HDR_BANNER == 'true':
             continue
     for i in tv.search(resolution="1080,720", hdr=True):
         try:
-            poster_hdr()
+            posterTV_hdr()
         except FileNotFoundError:
             print(Fore.RED+films.title+" Error, the HDR poster for this film could not be created.")
             print(Fore.RESET)
             continue
     for i in films.search(resolution="1080,720", hdr=True):
         try:
-            posterTV_hdr()
+            poster_hdr()
         except FileNotFoundError:
             print(Fore.RED+films.title+" Error, the HDR poster for this film could not be created.")
             print(Fore.RESET)
