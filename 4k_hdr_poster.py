@@ -225,7 +225,12 @@ def get_poster():
     else:
         print(Fore.RED+films.title+"cannot find the poster for this film")
         print(Fore.RESET)
-
+def posterTV_4k_hdr():
+    print(i.title + ' 4k HDR')     
+    get_TVposter()
+    check_for_banner() 
+    add_hdr()                                  
+    os.remove('poster.png')  
 def poster_4k_hdr():
     print(i.title + ' 4k HDR')     
     get_poster()
@@ -242,7 +247,7 @@ def posterTV_4k():
     print(i.title + " 4K Poster")
     get_TVposter()
     check_for_banner()                             
-    os.remove('poster.png')                    
+    #os.remove('poster.png')                    
 def poster_hdr():
     print(i.title + " HDR Poster") 
     get_poster() 
@@ -252,19 +257,26 @@ def posterTV_hdr():
     print(i.title + " HDR Poster") 
     get_TVposter()
     add_hdr()                                  
-    os.remove('poster.png')   
-
+    #os.remove('poster.png')   
 if HDR_BANNER == 'true':
+
     for i in tv.search(resolution="4k", hdr=False):
+        print(i)
         try:
             posterTV_4k()
+            for s in i.seasons():
+                i = s
+                posterTV_4k()
         except FileNotFoundError:
             print(Fore.RED+films.title+" Error, the 4k poster for this film could not be created.")
             print(Fore.RESET)
             continue    
     for i in tv.search(resolution="4k", hdr=True):
         try:
-            posterTV_hdr()
+            posterTV_4k_hdr()
+            for s in i.seasons():
+                i = s
+                posterTV_4k_hdr()
         except FileNotFoundError:
             print(Fore.RED+films.title+" Error, the 4k poster for this film could not be created.")
             print(Fore.RESET)
@@ -283,9 +295,16 @@ if HDR_BANNER == 'true':
             print(Fore.RED+films.title+" Error, the 4k HDR poster for this film could not be created.")
             print(Fore.RESET)
             continue
-    for i in films.search(resolution="1080,720", hdr=True):
+    for i in tv.search(resolution="1080,720", hdr=True):
         try:
             poster_hdr()
+        except FileNotFoundError:
+            print(Fore.RED+films.title+" Error, the HDR poster for this film could not be created.")
+            print(Fore.RESET)
+            continue
+    for i in films.search(resolution="1080,720", hdr=True):
+        try:
+            posterTV_hdr()
         except FileNotFoundError:
             print(Fore.RED+films.title+" Error, the HDR poster for this film could not be created.")
             print(Fore.RESET)
