@@ -51,17 +51,6 @@ This is a script to find all films in your library with a studio having Disney i
 
 It then does the same for Pixar
 
-# Docker install
-I have created a docker container for ease of use, epecially for people who aren't comfortable with Python. 
-
-To run the container enter the following:
-
-`docker run -d --name=Plex-utills -v </your/plex/media/folder>:/films -v /<your config directory>:/config jkirkcaldy/plex-utills`
-
-Or you can use docker-compose. An example file is located in the repository.
-
-All configuration is done in the config file. 
-
 # Manual Install
 ### Requirements
 Python3
